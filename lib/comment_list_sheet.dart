@@ -6,8 +6,13 @@ import '../services/service.dart';
 
 class CommentListSheet extends StatefulWidget {
   final int postId;
+  final VoidCallback? onCommentAdded; // ✅ yeni ekle
 
-  const CommentListSheet({super.key, required this.postId});
+  const CommentListSheet({
+    super.key,
+    required this.postId,
+    this.onCommentAdded, // ✅ constructor'a da ekle
+  });
 
   @override
   State<CommentListSheet> createState() => _CommentListSheetState();
@@ -57,6 +62,9 @@ class _CommentListSheetState extends State<CommentListSheet> {
     if (success) {
       _controller.clear();
       await _loadComments();
+
+      widget.onCommentAdded?.call(); // ✅ SAYFAYI YENİLET
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Yorum gönderildi')),
       );
@@ -88,6 +96,10 @@ class _CommentListSheetState extends State<CommentListSheet> {
       final success = await ApiService.deleteComment(commentId);
       if (success) {
         await _loadComments();
+
+        widget.onCommentAdded
+            ?.call(); // ✅ YORUM SİLİNDİKTEN SONRA ANA SAYFAYI YENİLE
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Yorum silindi")),
         );

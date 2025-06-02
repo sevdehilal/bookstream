@@ -5,6 +5,7 @@ import '../models/review.dart';
 import '../services/service.dart';
 import '../comment_list_sheet.dart';
 import '../user_profile_page.dart';
+import '../home_page_page.dart';
 
 class ReviewCard extends StatefulWidget {
   final Review review;
@@ -12,6 +13,7 @@ class ReviewCard extends StatefulWidget {
   final void Function(bool)? onLikeChanged;
   final bool showDeleteButton;
   final VoidCallback? onDelete;
+  final VoidCallback? onCommentAdded;
 
   const ReviewCard({
     super.key,
@@ -20,6 +22,7 @@ class ReviewCard extends StatefulWidget {
     this.onLikeChanged,
     this.showDeleteButton = false,
     this.onDelete,
+    this.onCommentAdded,
   });
 
   @override
@@ -59,9 +62,10 @@ class _ReviewCardState extends State<ReviewCard> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) {
-        return CommentListSheet(postId: widget.review.id);
-      },
+      builder: (context) => CommentListSheet(
+        postId: widget.review.id,
+        onCommentAdded: widget.onCommentAdded, // ✅ burası önemli
+      ),
     );
   }
 
@@ -103,63 +107,6 @@ class _ReviewCardState extends State<ReviewCard> {
 
     if (confirmed == true) {
       widget.onDelete?.call();
-    }
-  }
-
-  void _showCommentDialog() async {
-    final controller = TextEditingController();
-
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Yorum Yap'),
-        content: TextField(
-          controller: controller,
-          maxLines: 3,
-          decoration: const InputDecoration(hintText: 'Yorumunuzu yazın...'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('İptal'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: const Text('Gönder'),
-          ),
-        ],
-      ),
-    );
-
-    if (result != null && result.isNotEmpty) {
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        final userId = prefs.getInt("userId");
-
-        if (userId == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Kullanıcı bulunamadı")),
-          );
-          return;
-        }
-
-        final success = await ApiService.addComment(
-          postId: widget.review.id,
-          text: result,
-        );
-
-        if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Yorum başarıyla eklendi")),
-          );
-        } else {
-          throw Exception();
-        }
-      } catch (_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Yorum gönderilemedi")),
-        );
-      }
     }
   }
 
@@ -334,6 +281,10 @@ class _ReviewCardState extends State<ReviewCard> {
                   ),
                   visualDensity: VisualDensity.compact,
                   splashRadius: 18,
+                ),
+                Text(
+                  '${review.commentCount}',
+                  style: const TextStyle(fontSize: 13, color: Colors.black87),
                 ),
               ],
             ),

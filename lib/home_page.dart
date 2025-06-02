@@ -4,15 +4,26 @@ import 'home_page_page.dart';
 import 'profile_page.dart';
 import 'navbar.dart';
 import 'login_page.dart';
-import 'search_page.dart'; // Search sayfasını import et
+import 'search_page.dart';
 
 class HomePage extends StatefulWidget {
+  // 🔁 Harici sayfalardan tab değiştirmek için bu method çağrılır
+  final int initialIndex;
+
+  const HomePage({Key? key, this.initialIndex = 0}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
 
   final List<Widget> _pages = [
     GeneralOverviewPage(),
@@ -37,24 +48,25 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => SearchPage()), // Arama sayfasına yönlendir
+        builder: (context) => SearchPage(), // Arama sayfasına yönlendir
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 212, 223, 231),
+      backgroundColor: const Color.fromARGB(255, 212, 223, 231),
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 212, 223, 231),
+        backgroundColor: const Color.fromARGB(255, 212, 223, 231),
         title: Row(
           children: [
             Icon(Icons.library_books, color: Colors.blueGrey[700]),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
               'BookStream',
               style: TextStyle(
-                color: Colors.blueGrey[700], // Arka planla uyumlu
+                color: Colors.blueGrey[700],
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
@@ -65,21 +77,18 @@ class _HomePageState extends State<HomePage> {
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
-            onPressed: _navigateToSearch, // Arama sayfasına yönlendirme
+            icon: const Icon(Icons.search),
+            onPressed: _navigateToSearch,
           ),
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: _logout,
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _pages[_selectedIndex],
-          ),
-        ],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
       ),
       bottomNavigationBar: Navbar(
         selectedIndex: _selectedIndex,

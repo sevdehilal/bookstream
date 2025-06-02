@@ -69,95 +69,140 @@ class _QuotePageState extends State<QuotePage> {
     final typeId = arguments['type'];
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 212, 223, 231),
+      backgroundColor: const Color.fromARGB(255, 212, 223, 231),
       appBar: AppBar(
-          title: Text("Alıntı Ekle"),
-          backgroundColor: Color.fromARGB(255, 212, 223, 231)),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        backgroundColor: const Color.fromARGB(255, 212, 223, 231),
+        title: const Text(
+          "Alıntı Ekle",
+          style: TextStyle(
+            color: Colors.black87,
+            backgroundColor: const Color.fromARGB(255, 212, 223, 231),
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black87),
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (_book != null)
-              Row(
-                children: [
-                  _getImage(_book!.coverImage),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _book!.title,
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+              Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                elevation: 4,
+                color: const Color.fromARGB(255, 227, 238, 246),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: _getImage(_book!.coverImage),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _book!.title,
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${_book!.author.firstName} ${_book!.author.lastName}',
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black54),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Yazar: ${_book!.author.firstName} ${_book!.author.lastName}',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
+                      )
+                    ],
                   ),
-                ],
+                ),
               ),
-            SizedBox(height: 16),
+            const SizedBox(height: 24),
+            const Text(
+              'Alıntınızı Yazın',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
             TextField(
               controller: _textController,
               maxLines: 6,
               decoration: InputDecoration(
-                labelText: 'Alıntı metni',
-                border: OutlineInputBorder(),
+                hintText: 'Alıntı metni buraya yazın...',
+                filled: true,
+                fillColor: const Color.fromARGB(255, 227, 238, 246),
+                contentPadding: const EdgeInsets.all(16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Colors.blueGrey),
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            _isLoading
-                ? CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: () async {
-                      final text = _textController.text.trim();
-                      if (text.isEmpty) {
-                        setState(() {
-                          _errorMessage = 'Lütfen bir alıntı girin.';
-                        });
-                        return;
-                      }
-
-                      setState(() {
-                        _isLoading = true;
-                        _errorMessage = null;
-                      });
-
-                      try {
-                        final review = await ApiService.postReview(
-                          userId: userId,
-                          bookId: bookId,
-                          typeId: typeId,
-                          text: text,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Alıntı başarıyla eklendi!')),
-                        );
-                        Navigator.pop(context, review);
-                      } catch (e) {
-                        setState(() {
-                          _errorMessage = e.toString();
-                        });
-                      } finally {
-                        setState(() {
-                          _isLoading = false;
-                        });
-                      }
-                    },
-                    child: Text('Gönder'),
-                  ),
-            if (_errorMessage != null) ...[
-              SizedBox(height: 10),
+            if (_errorMessage != null)
               Text(
                 _errorMessage!,
-                style: TextStyle(color: Colors.red),
+                style: const TextStyle(color: Colors.red),
               ),
-            ],
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey[700],
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () async {
+                        final text = _textController.text.trim();
+                        if (text.isEmpty) {
+                          setState(
+                              () => _errorMessage = 'Lütfen bir alıntı girin.');
+                          return;
+                        }
+
+                        setState(() {
+                          _isLoading = true;
+                          _errorMessage = null;
+                        });
+
+                        try {
+                          final review = await ApiService.postReview(
+                            userId: userId,
+                            bookId: bookId,
+                            typeId: typeId,
+                            text: text,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Alıntı başarıyla eklendi!')),
+                          );
+                          Navigator.pop(context, review);
+                        } catch (e) {
+                          setState(() => _errorMessage = e.toString());
+                        } finally {
+                          setState(() => _isLoading = false);
+                        }
+                      },
+                      icon: const Icon(Icons.send,
+                          color: const Color.fromARGB(255, 227, 238, 246)),
+                      label: const Text(
+                        'Gönder',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: const Color.fromARGB(255, 227, 238, 246),
+                        ),
+                      ),
+                    ),
+                  ),
           ],
         ),
       ),

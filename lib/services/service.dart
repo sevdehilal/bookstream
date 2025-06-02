@@ -929,4 +929,41 @@ class ApiService {
 
     return response.statusCode == 200;
   }
+
+  static Future<List<Book>> fetchRecommendedBooks({
+    required int userId,
+    required int page,
+    required int pageSize,
+  }) async {
+    final response = await http.get(Uri.parse(
+        'https://bookstream.online/api/Recommendation/$userId?page=$page&pageSize=$pageSize'));
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      final List<dynamic> dataList = decoded['data'];
+      return dataList.map((item) => Book.fromJson(item)).toList();
+    } else {
+      throw Exception('Kitap önerileri alınamadı.');
+    }
+  }
+
+  static Future<Map<String, dynamic>?> fetchBookRating(int bookId) async {
+    final url = Uri.parse('https://bookstream.online/api/Book/rating/$bookId');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true && data['data'] != null) {
+          return {
+            'averageRating': (data['data']['averageRating'] as num).toDouble(),
+            'totalVotes': data['data']['totalVotes'] as int,
+          };
+        }
+      }
+    } catch (e) {
+      // log ya da hata mesajı göstermek istersen buraya yaz
+    }
+    return null;
+  }
 }

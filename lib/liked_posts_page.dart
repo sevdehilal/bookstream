@@ -88,6 +88,7 @@ class _LikedPostsPageState extends State<LikedPostsPage> {
 
   Widget _buildPost(Review review) {
     return Card(
+      color: const Color.fromARGB(255, 227, 238, 246),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 2,

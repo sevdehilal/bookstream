@@ -22,6 +22,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
   int? userId;
   List<Review> _reviews = [];
   bool _isLoadingReviews = true;
+  double? _averageRating;
+  int? _totalVotes;
 
   @override
   void initState() {
@@ -29,6 +31,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
     _loadBookDetails();
     _loadUserId();
     _loadReviews(); // yorumları da yükle
+    _fetchRating();
   }
 
   Future<void> _loadReviews() async {
@@ -43,6 +46,16 @@ class _BookDetailPageState extends State<BookDetailPage> {
       print("Yorumlar yüklenemedi: $e");
       setState(() {
         _isLoadingReviews = false;
+      });
+    }
+  }
+
+  Future<void> _fetchRating() async {
+    final result = await ApiService.fetchBookRating(widget.bookId);
+    if (result != null) {
+      setState(() {
+        _averageRating = result['averageRating'];
+        _totalVotes = result['totalVotes'];
       });
     }
   }
@@ -114,7 +127,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      BookInfoCard(book: _book!),
+                      BookInfoCard(
+                        book: _book!,
+                        averageRating: _averageRating,
+                        totalVotes: _totalVotes,
+                      ),
                       Center(
                         // 👈🏻 Buton grubunun tamamını ortaladık
                         child: Wrap(
@@ -253,7 +270,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
                                       width: double.infinity,
                                       margin: EdgeInsets.symmetric(vertical: 8),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color: const Color.fromARGB(
+                                            255, 227, 238, 246),
                                         borderRadius: BorderRadius.circular(10),
                                         boxShadow: [
                                           BoxShadow(

@@ -14,6 +14,7 @@ class Review {
   final DateTime? createDate;
   final bool isFavorite; // ✅ Burayı ekledik
   final int likeCount;
+  final int commentCount;
 
   Review({
     required this.id,
@@ -26,7 +27,8 @@ class Review {
     required this.text,
     required this.createDate,
     required this.isFavorite,
-    required this.likeCount, // ✅ Constructor'a da ekledik
+    required this.likeCount,
+    required this.commentCount, // ✅ Constructor'a da ekledik
   });
 
   factory Review.fromJson(Map<String, dynamic> json) {
@@ -43,7 +45,8 @@ class Review {
           ? DateTime.tryParse(json['createDate'])
           : null,
       isFavorite: json['isFavorite'] ?? false,
-      likeCount: json['likeCount'] ?? 0, // ✅ JSON'dan da çektik
+      likeCount: json['likeCount'] ?? 0,
+      commentCount: json['commentCount'] ?? 0, // ✅ JSON'dan da çektik
     );
   }
 }

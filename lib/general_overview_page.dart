@@ -109,9 +109,9 @@ class _GeneralOverviewPageState extends State<GeneralOverviewPage> {
       case 2:
         return 'Tamamlandı';
       case 3:
-        return 'Reddedildi';
+        return 'İptal Edildi';
       default:
-        return 'Bilinmeyen';
+        return 'Reddedildi';
     }
   }
 
@@ -127,7 +127,7 @@ class _GeneralOverviewPageState extends State<GeneralOverviewPage> {
               // 📷 Resim ekleniyor:
               if (campaign.image != null)
                 SizedBox(
-                  height: 150,
+                  height: 120,
                   width: double.infinity,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
@@ -211,7 +211,7 @@ class _GeneralOverviewPageState extends State<GeneralOverviewPage> {
                   : ElevatedButton(
                       onPressed: _loadMyCampaigns,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.indigo,
+                        backgroundColor: Colors.blueGrey[700],
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -254,7 +254,7 @@ class _GeneralOverviewPageState extends State<GeneralOverviewPage> {
                       itemBuilder: (context, index) {
                         final campaign = campaigns[index];
                         return SizedBox(
-                          height: 250,
+                          height: 220,
                           child: Card(
                             margin: EdgeInsets.symmetric(
                                 vertical: 8, horizontal: 16),
@@ -310,25 +310,26 @@ class _GeneralOverviewPageState extends State<GeneralOverviewPage> {
                                     ],
                                   ),
                                   Spacer(),
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: ElevatedButton(
-                                      onPressed: () => showCargoCodePopup(
-                                          campaign.cargoCode ?? ''),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.teal[700],
-                                        foregroundColor: Colors.white,
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 8),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                  if (!showingMyCampaigns)
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: ElevatedButton(
+                                        onPressed: () => showCargoCodePopup(
+                                            campaign.cargoCode ?? ''),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.teal[700],
+                                          foregroundColor: Colors.white,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 8),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
                                         ),
+                                        child: Text(
+                                            "Bağışta bulunmak istiyorsanız tıklayın"),
                                       ),
-                                      child: Text(
-                                          "Bağışta bulunmak istiyorsanız tıklayın"),
                                     ),
-                                  ),
                                 ],
                               ),
                             ),

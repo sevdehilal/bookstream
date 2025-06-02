@@ -4,6 +4,9 @@ import '../services/service.dart'; // ApiService burada
 import '../models/book.dart';
 import '../models/active_user.dart';
 import 'home_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'profile_page.dart';
 import 'book_detail_page.dart';
 import 'user_profile_page.dart'; // Kullanıcı profiline yönlendirmek için
 
@@ -157,35 +160,49 @@ class _SearchPageState extends State<SearchPage> {
       elevation: 4,
       margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: ListTile(
-        leading: imageProvider != null
-            ? ClipOval(
-                child: Image(
-                  image: imageProvider,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
+          leading: imageProvider != null
+              ? ClipOval(
+                  child: Image(
+                    image: imageProvider,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.grey,
+                  child: Icon(Icons.person, color: Colors.white),
                 ),
-              )
-            : CircleAvatar(
-                radius: 25,
-                backgroundColor: Colors.grey,
-                child: Icon(Icons.person, color: Colors.white),
-              ),
-        title: Text(
-          '${user.name} ${user.surname}',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text('@${user.username}'),
-        onTap: () {
-          print('Tıklanan kullanıcı id: ${user.id}');
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => UserProfilePage(userId: user.id),
-            ),
-          );
-        },
-      ),
+          title: Text(
+            '${user.name} ${user.surname}',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text('@${user.username}'),
+          onTap: () async {
+            print('Tıklanan kullanıcı id: ${user.id}');
+
+            final prefs = await SharedPreferences.getInstance();
+            final currentUserId = prefs.getInt('userId');
+
+            if (user.id == currentUserId) {
+              // ✅ Kullanıcı kendisi ise: arama sayfasını kapat ve doğrudan HomePage'in profil sekmesine yönlendir
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => HomePage(initialIndex: 2)),
+                (route) => false,
+              );
+            } else {
+              // Başka bir kullanıcıya gidilecekse
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserProfilePage(userId: user.id),
+                ),
+              );
+            }
+          }),
     );
   }
 

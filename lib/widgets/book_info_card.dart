@@ -5,8 +5,15 @@ import 'package:flutter/gestures.dart';
 
 class BookInfoCard extends StatefulWidget {
   final Book book;
+  final double? averageRating;
+  final int? totalVotes;
 
-  const BookInfoCard({Key? key, required this.book}) : super(key: key);
+  const BookInfoCard({
+    Key? key,
+    required this.book,
+    this.averageRating,
+    this.totalVotes,
+  }) : super(key: key);
 
   @override
   State<BookInfoCard> createState() => _BookInfoCardState();
@@ -45,6 +52,7 @@ class _BookInfoCardState extends State<BookInfoCard> {
         : '${description.substring(0, _maxLength)}...';
 
     return Card(
+      color: const Color.fromARGB(255, 225, 241, 252),
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 24),
       shape: RoundedRectangleBorder(
@@ -95,6 +103,18 @@ class _BookInfoCardState extends State<BookInfoCard> {
               ],
             ),
 
+            const SizedBox(height: 16),
+            if (widget.averageRating != null && widget.totalVotes != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                'Puan: ${widget.averageRating!.toStringAsFixed(1)} (${widget.totalVotes} oy)',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
 
             // Açıklama
